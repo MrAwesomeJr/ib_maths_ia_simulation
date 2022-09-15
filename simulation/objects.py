@@ -26,21 +26,23 @@ class Cube(Polyhedron):
         self.color = color
         self.draw_points = False
 
+        # rotation = rotation % 90
+
         radius = side_length / 2
         for x_value in (x - radius, x + radius):
             for y_value in (y - radius, y + radius):
                 for z_value in (z - radius, z + radius):
                     self.points.append(Point(x_value, y_value, z_value, self.color))
 
-        print(len(self.points))
 
         # points which share two of the same axes should have a line between them
-        for i1, point1 in enumerate(self.points):
-            print(point1)
-            for i2, point2 in enumerate(self.points):
-                if point1.list() != point2.list() and len(set(point1.list()) & set(point2.list())) == 2:
-                    if (point2, point1) not in self.lines:
-                        self.lines.append((point1, point2))
-                        print(i1, i2)
+        for point1 in self.points:
+            for point2 in self.points:
+                if point1.list() != point2.list():
+                    count = 0
+                    for index, direction in enumerate(point1.list()):
+                        if direction == point2.list()[index]:
+                            count += 1
 
-        print(len(self.lines))
+                    if count == 2 and (point2, point1) not in self.lines:
+                        self.lines.append((point1, point2))

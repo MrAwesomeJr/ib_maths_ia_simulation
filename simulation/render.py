@@ -1,6 +1,7 @@
 from objects import *
 from math import tan, atan, degrees, radians
 
+
 class Render3D:
     def __init__(self, screen, x_fov, y_fov, x, y, width, height):
         self.screen = screen
@@ -17,7 +18,7 @@ class Render3D:
             if type(object) == Point:
                 if self.can_be_rendered(space, object.x, object.y, object.z):
                     x, y = self.calculate_pixels(object.x - space.x, object.y - space.y, object.z - space.z)
-                    self.screen.draw_circle(x + self.x, y + self.y, 5, object.color)
+                    self.screen.draw_circle(x + self.x + self.width / 2, y + self.y + self.height / 2, 10, object.color)
 
             elif type(object) == Polyhedron or issubclass(type(object), Polyhedron):
                 if object.draw_lines:
@@ -25,24 +26,24 @@ class Render3D:
                         if self.can_be_rendered(space, line[0].x, line[0].y, line[0].z) and self.can_be_rendered(space, line[1].x, line[1].y, line[1].z):
                             x1, y1 = self.calculate_pixels(line[0].x - space.x, line[0].y - space.y, line[0].z - space.z)
                             x2, y2 = self.calculate_pixels(line[1].x - space.x, line[1].y - space.y, line[1].z - space.z)
-                            self.screen.draw_line(x1 + self.x, y1 + self.y, x2 + self.x, y2 + self.y, object.color)
+                            self.screen.draw_line(x1 + self.x + self.width / 2, y1 + self.y + self.height / 2, x2 + self.x + self.width / 2, y2 + self.y + self.height / 2, object.color)
 
                 if object.draw_points:
                     for point in object.points:
                         if self.can_be_rendered(space, point.x, point.y, point.z):
                             x, y = self.calculate_pixels(point.x - space.x, point.y - space.y, point.z - space.z)
-                            self.screen.draw_circle(x + self.x, y + self.y, 10, object.color)
+                            self.screen.draw_circle(x + self.x, y + self.y, 5, object.color)
                 
     def calculate_x_pixel(self, x, z):
         if self.x_fov == 0:
             return x
-        new_x = self.width / 2 * (1 + degrees(atan(x / (z + (2 * tan(radians(self.x_fov)) / self.width)))) / (2 * self.x_fov))
+        new_x = self.width * x / (2 * z * tan(radians(self.x_fov)))
         return new_x
     
     def calculate_y_pixel(self, y, z):
         if self.y_fov == 0:
             return y
-        new_y = self.height / 2 * (1 + degrees(atan(y / (z + (2 * tan(radians(self.y_fov)) / self.height)))) / (2 * self.y_fov))
+        new_y = self.width * y / (2 * z * tan(radians(self.y_fov)))
         return new_y
 
     def calculate_pixels(self, x, y, z):
@@ -52,6 +53,11 @@ class Render3D:
 
     def can_be_rendered(self, space, x, y, z):
         if z <= space.z:
+            return False
+        # within the fov cone
+        elif self.calculate_x_pixel(abs(x - space.x), z - space.z) > (self.width / 2):
+            return False
+        elif self.calculate_y_pixel(abs(y - space.y), z - space.z) > (self.height / 2):
             return False
         return True
 
@@ -68,3 +74,39 @@ class Render2D_TopDown:
 
     def render(self, space):
         self.screen.draw_rect(self.x, self.y, self.width, self.height, (100, 100, 100))
+        # 0, 0 in 3D space is self.width / 2, self.height in 2D space
+
+        # view cone
+        self.screen.draw_polygon([(self.x + space.x + self.width / 2, self.y + self.height - space.z),
+                                  (self.x + space.x + self.width / 2 - tan(radians(self.x_fov)) * (self.height - space.z), self.y),
+                                  (self.x + space.x + self.width / 2 + tan(radians(self.x_fov)) * (self.height - space.z), self.y)],
+                                 (50, 150, 50))
+
+        # you
+        self.screen.draw_circle(space.x + self.width / 2 + self.x, - space.z + self.height + self.y, 10, (127, 0, 0))
+
+        for object in space.objects:
+            if type(object) == Point:
+                if self.can_be_rendered(space, object.x, object.y, object.z):
+                    self.screen.draw_circle(object.x + self.width / 2 + self.x, - object.z + self.height + self.y, 10, object.color)
+
+            elif type(object) == Polyhedron or issubclass(type(object), Polyhedron):
+                if object.draw_lines:
+                    for line in object.lines:
+                        if self.can_be_rendered(space, line[0].x, line[0].y, line[0].z) and self.can_be_rendered(space, line[1].x, line[1].y, line[1].z):
+                            self.screen.draw_line(line[0].x + self.width / 2 + self.x, - line[0].z + self.height + self.y, line[1].x + self.width / 2 + self.x, - line[1].z + self.height + self.y, object.color)
+
+                if object.draw_points:
+                    for point in object.points:
+                        if self.can_be_rendered(space, point.x, point.y, point.z):
+                            self.screen.draw_circle(point.x + self.width / 2 + self.x, - point.z + self.height + self.y, 5, object.color)
+
+            self.screen.draw_text(str(space.coords()), space.x + self.width / 2 + self.x, - space.z + self.height + self.y, 10, (255, 255, 255))
+
+
+    def can_be_rendered(self, space, x, y, z):
+        if abs(x) > self.width / 2:
+            return False
+        elif z <= 0 or z >= self.height:
+            return False
+        return True
