@@ -11,6 +11,19 @@ class Point:
     def __str__(self):
         return str(self.list())
 
+class Text:
+    def __init__(self, x, y, z, text, color=(255, 255, 255)):
+        self.x = x
+        self.y = y
+        self.z = z
+        self.text = text
+        self.color = color
+
+class Line:
+    def __init__(self, coords1, coords2, color=(255, 255, 255)):
+        self.color = color
+        self.point1 = Point(coords1[0], coords1[1], coords1[2], color)
+        self.point2 = Point(coords2[0], coords2[1], coords2[2], color)
 
 class Polyhedron:
     def __init__(self):
