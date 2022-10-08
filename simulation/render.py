@@ -48,55 +48,49 @@ class Render3D:
                             self.screen.draw_circle(x + self.x, y + self.y, 5, object.color)
                 
     def calculate_x_pixel(self, space, x, z):
-        x, z = self.rotate_x(space, x, z)
         if self.x_fov == 0:
+            return x
+        if z == 0:
             return x
         new_x = self.width * x / (2 * z * tan(radians(self.x_fov)))
         return new_x
     
     def calculate_y_pixel(self, space, y, z):
-        y, z = self.rotate_y(space, y, z)
         if self.y_fov == 0:
+            return y
+        if z == 0:
             return y
         new_y = self.width * y / (2 * z * tan(radians(self.y_fov)))
         return new_y
 
     def rotate_x(self, space, x, z):
-        if space.x_angle == 0:
-            return (x, z)
-        if x == 0:
-            angle = pi / 2 + radians(space.x_angle)
-        else:
-            angle = atan(z / x) + radians(space.x_angle)
-        new_x = (x**2 + z**2)**(1/2) * cos(angle)
-        new_z = (z**2 + x**2)**(1/2) * sin(angle)
+        new_x = cos(radians(space.x_angle))*x - sin(radians(space.x_angle))*z
+        new_z = sin(radians(space.x_angle))*x + cos(radians(space.x_angle))*z
         return new_x, new_z
 
     def rotate_y(self, space, y, z):
-        if space.y_angle == 0:
-            return (y, z)
-        if y == 0:
-            angle = pi / 2 + radians(space.y_angle)
-        else:
-            angle = atan(z / y) + radians(space.y_angle)
-        new_y = (y**2 + z**2)**(1/2) * cos(angle)
-        new_z = (z**2 + y**2)**(1/2) * sin(angle)
+        new_y = cos(radians(space.y_angle))*y - sin(radians(space.y_angle))*z
+        new_z = sin(radians(space.y_angle))*y + cos(radians(space.y_angle))*z
         return new_y, new_z
 
 
     def calculate_pixels(self, space, x, y, z):
-        new_x = self.calculate_x_pixel(space, x, z)
-        new_y = self.calculate_y_pixel(space, y, z)
+        rotated_x, rotated_z = self.rotate_x(space, x, z)
+        rotated_y, rotated_z = self.rotate_y(space, y, rotated_z)
+        new_x = self.calculate_x_pixel(space, rotated_x, rotated_z)
+        new_y = self.calculate_y_pixel(space, rotated_y, rotated_z)
         return new_x, new_y
 
     def can_be_rendered(self, space, x, y, z):
-        if z < space.z:
-            return False
+        #TODO: add support for rotation
+
+        # if z < space.z:
+        #     return False
         # within the fov cone
-        elif abs(self.calculate_x_pixel(space, x - space.x, z - space.z)) > (self.width / 2):
-            return False
-        elif abs(self.calculate_y_pixel(space, y - space.y, z - space.z)) > (self.height / 2):
-            return False
+        # elif abs(self.calculate_x_pixel(space, x - space.x, z - space.z)) > (self.width / 2):
+        #     return False
+        # elif abs(self.calculate_y_pixel(space, y - space.y, z - space.z)) > (self.height / 2):
+        #     return False
         return True
 
 
@@ -116,8 +110,8 @@ class Render2D_TopDown:
 
         # view cone
         self.screen.draw_polygon([(self.x + space.x + self.width / 2, self.y + self.height - space.z),
-                                  (self.x + space.x + self.width / 2 - tan(radians(self.x_fov)) * (self.height - space.z), self.y),
-                                  (self.x + space.x + self.width / 2 + tan(radians(self.x_fov)) * (self.height - space.z), self.y)],
+                                  (self.x + self.width / 2 + (self.width + self.height)*sin(radians(space.x_angle - self.x_fov)), self.y + self.height - space.z - (self.width + self.height)*cos(radians(space.x_angle - self.x_fov))),
+                                  (self.x + self.width / 2 + (self.width + self.height)*sin(radians(space.x_angle + self.x_fov)), self.y + self.height - space.z - (self.width + self.height)*cos(radians(space.x_angle + self.x_fov)))],
                                  (50, 150, 50))
 
         # you
@@ -144,7 +138,7 @@ class Render2D_TopDown:
                         if self.can_be_rendered(space, point.x, point.y, point.z):
                             self.screen.draw_circle(point.x + self.width / 2 + self.x, - point.z + self.height + self.y, 5, object.color)
 
-            self.screen.draw_text(str(space.coords()), space.x + self.width / 2 + self.x, - space.z + self.height + self.y, 10, (255, 255, 255))
+            self.screen.draw_text(str(space.coords()) + " " + str(space.x_angle) + "°," + str(space.y_angle) + "°", space.x + self.width / 2 + self.x, - space.z + self.height + self.y, 10, (255, 255, 255))
 
 
     def can_be_rendered(self, space, x, y, z):

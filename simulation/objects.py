@@ -39,8 +39,6 @@ class Cube(Polyhedron):
         self.color = color
         self.draw_points = False
 
-        # rotation = rotation % 90
-
         radius = side_length / 2
         for x_value in (x - radius, x + radius):
             for y_value in (y - radius, y + radius):
