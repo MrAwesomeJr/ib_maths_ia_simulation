@@ -50,13 +50,13 @@ class Render3D:
         self.screen.draw_text(str(space.coords()) + " " + str(space.x_angle) + "°," + str(space.y_angle) + "°", self.x + 5, self.y + 5, 10, (0, 0, 0))
 
         # left
-        self.screen.draw_line(self.x, self.y, self.x, self.y + self.height, (0, 0, 0))
+        self.screen.draw_line(self.x, self.y, self.x, self.y + self.height - 1, (0, 0, 0))
         # right
-        self.screen.draw_line(self.x + self.width, self.y, self.x + self.width, self.y + self.height, (0, 0, 0))
+        self.screen.draw_line(self.x + self.width - 1, self.y, self.x + self.width - 1, self.y + self.height - 1, (0, 0, 0))
         # top
-        self.screen.draw_line(self.x, self.y, self.x + self.width, self.y, (0, 0, 0))
+        self.screen.draw_line(self.x, self.y, self.x + self.width - 1, self.y, (0, 0, 0))
         # bottom
-        self.screen.draw_line(self.x, self.y + self.height, self.x + self.width, self.y + self.height, (0, 0, 0))
+        self.screen.draw_line(self.x, self.y + self.height - 1, self.x + self.width - 1, self.y + self.height - 1, (0, 0, 0))
                 
     def calculate_x_pixel(self, space, x, z):
         if self.x_fov == 0:
@@ -150,13 +150,13 @@ class Render2D_TopDown:
                             self.screen.draw_circle(point.x + self.width / 2 + self.x, - point.z + self.height + self.y, 5, object.color)
 
         # left
-        self.screen.draw_line(self.x, self.y, self.x, self.y + self.height, (0, 0, 0))
+        self.screen.draw_line(self.x, self.y, self.x, self.y + self.height - 1, (0, 0, 0))
         # right
-        self.screen.draw_line(self.x + self.width, self.y, self.x + self.width, self.y + self.height, (0, 0, 0))
+        self.screen.draw_line(self.x + self.width - 1, self.y, self.x + self.width - 1, self.y + self.height - 1, (0, 0, 0))
         # top
-        self.screen.draw_line(self.x, self.y, self.x + self.width, self.y, (0, 0, 0))
+        self.screen.draw_line(self.x, self.y, self.x + self.width - 1, self.y, (0, 0, 0))
         # bottom
-        self.screen.draw_line(self.x, self.y + self.height, self.x + self.width, self.y + self.height, (0, 0, 0))
+        self.screen.draw_line(self.x, self.y + self.height - 1, self.x + self.width - 1, self.y + self.height - 1, (0, 0, 0))
 
 
     def can_be_rendered(self, space, x, y, z):

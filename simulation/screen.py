@@ -2,7 +2,7 @@ import pygame
 
 class Screen:
     def __init__(self, background_color):
-        self.screen = pygame.display.set_mode((1440, 854))
+        self.screen = pygame.display.set_mode((1440, 846))
         self.clock = pygame.time.Clock()
         self.clock.tick(1) # 1fps
         self.background_color = background_color
