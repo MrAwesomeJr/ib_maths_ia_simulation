@@ -1,5 +1,5 @@
 class Point:
-    def __init__(self, x, y, z, color=(255, 255, 255)):
+    def __init__(self, x, y, z, color=(0, 0, 0)):
         self.x = x
         self.y = y
         self.z = z
@@ -12,7 +12,7 @@ class Point:
         return str(self.list())
 
 class Text:
-    def __init__(self, x, y, z, text, color=(255, 255, 255)):
+    def __init__(self, x, y, z, text, color=(0, 0, 0)):
         self.x = x
         self.y = y
         self.z = z
@@ -20,7 +20,7 @@ class Text:
         self.color = color
 
 class Line:
-    def __init__(self, coords1, coords2, color=(255, 255, 255)):
+    def __init__(self, coords1, coords2, color=(0, 0, 0)):
         self.color = color
         self.point1 = Point(coords1[0], coords1[1], coords1[2], color)
         self.point2 = Point(coords2[0], coords2[1], coords2[2], color)
@@ -34,7 +34,7 @@ class Polyhedron:
 
 
 class Cube(Polyhedron):
-    def __init__(self, x, y, z, side_length, color=(255, 255, 255)):
+    def __init__(self, x, y, z, side_length, color=(0, 0, 0)):
         super().__init__()
         self.color = color
         self.draw_points = False

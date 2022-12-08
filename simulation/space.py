@@ -9,13 +9,12 @@ class Space:
         self.z = 0
         self.objects = []
         self.sensitivity = 50
-        self.bounds = (1000, 1000, 1000)
+        self.angle_sensitivity = 15
         self.x_angle = 0
         self.y_angle = 0
 
     def update_space(self):
         self.get_input()
-        self.set_bounds()
 
     def get_input(self):
         key_down_events = pygame.event.get(eventtype=pygame.KEYDOWN)
@@ -34,29 +33,13 @@ class Space:
             elif key_event.key == pygame.K_LSHIFT:
                 self.y -= self.sensitivity
             elif key_event.key == pygame.K_j:
-                self.x_angle -= 15
+                self.x_angle -= self.angle_sensitivity
             elif key_event.key == pygame.K_l:
-                self.x_angle += 15
+                self.x_angle += self.angle_sensitivity
             elif key_event.key == pygame.K_i:
-                self.y_angle += 15
+                self.y_angle += self.angle_sensitivity
             elif key_event.key == pygame.K_k:
-                self.y_angle -= 15
-
-    def set_bounds(self):
-        if self.x > self.bounds[0]:
-            self.x = self.bounds[0]
-        elif self.x < -self.bounds[0]:
-            self.x = -self.bounds[0]
-
-        if self.y > self.bounds[1]:
-            self.y = self.bounds[1]
-        elif self.y < -self.bounds[1]:
-            self.y = -self.bounds[1]
-
-        if self.z > self.bounds[2]:
-            self.z = self.bounds[2]
-        elif self.z < -self.bounds[2]:
-            self.z = -self.bounds[2]
+                self.y_angle -= self.angle_sensitivity
 
     def coords(self):
         return (self.x, self.y, self.z)
