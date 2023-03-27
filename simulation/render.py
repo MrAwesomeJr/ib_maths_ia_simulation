@@ -93,15 +93,22 @@ class Render3D:
         return new_x, new_y
 
     def can_be_rendered(self, space, x, y, z):
-        #TODO: add support for rotation
 
-        # if z < space.z:
-        #     return False
-        # within the fov cone
-        # elif abs(self.calculate_x_pixel(space, x - space.x, z - space.z)) > (self.width / 2):
-        #     return False
-        # elif abs(self.calculate_y_pixel(space, y - space.y, z - space.z)) > (self.height / 2):
-        #     return False
+        x = x - space.x
+        y = y - space.y
+        z = z - space.z
+
+        rotated_x, rotated_z = self.rotate_x(space, x, z)
+        rotated_y, rotated_z = self.rotate_y(space, y, rotated_z)
+        new_x = self.calculate_x_pixel(space, rotated_x, rotated_z)
+        new_y = self.calculate_y_pixel(space, rotated_y, rotated_z)
+
+        if rotated_z <= 0:
+            return False
+        elif abs(new_x) > (self.width / 2):
+            return False
+        elif abs(new_y) > (self.height / 2):
+            return False
         return True
 
 
